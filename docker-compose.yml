@@ -1,0 +1,45 @@
+version: '3'
+services:
+  main:
+    container_name: 'mainserver'
+    image: 'nginx:wnet'
+    ports:
+      - 8080:80
+    volumes:
+      - ./main:/etc/nginx
+    networks:
+      - nginx_bridge
+  server1:
+    container_name: 'server1'
+    image: 'nginx:wnet'
+    expose:
+      - 80
+    ports:
+      - 8081:80 # for troubleshooting purpose
+    volumes:
+      - ./servers:/etc/nginx
+      - ./website/:/home/htdocs
+    networks:
+      nginx_bridge:
+        ipv4_address: 172.20.0.3
+  server2:
+    container_name: 'server2'
+    image: 'nginx:wnet'
+    ports:
+      - 8082:80 # for troubleshooting purpose 
+    expose:
+      - 80
+    networks:
+      nginx_bridge:
+        ipv4_address: 172.20.0.4
+    volumes:
+      - ./servers:/etc/nginx
+      - ./website/:/home/htdocs
+  
+networks:
+  nginx_bridge:
+    driver: 'bridge'
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
